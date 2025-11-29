@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>نظام إدارة سندات التبرعات - جمعية وفود الحرم</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --primary: #1e7f72;
+      --primary-dark: #14564b;
+      --accent: #d6b980;
+      --bg: #f3f4f6;
+      --card-border: #e0e4ec;
+      --text-main: #1f2933;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Tahoma", "Dubai", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top left, rgba(30,127,114,0.12), transparent 50%), var(--bg);
+      color: var(--text-main);
+      padding: 20px;
+    }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #101820, #13272a);
+      color: #fefefe;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+    }
+
+    .site-logo {
+      width: 60px;
+      height: auto;
+      background: #ffffff10;
+      border-radius: 50%;
+      padding: 6px;
+      object-fit: contain;
+    }
+
+    .site-title-block h1 {
+      font-size: 23px;
+      margin-bottom: 2px;
+    }
+
+    .subtitle {
+      color: #cfd8dc;
+      font-size: 13px;
+    }
+
+    .layout {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      margin-top: 18px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 3px 12px rgba(15,23,42,0.04);
+      padding: 20px 20px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset-inline-start: -40px;
+      inset-block-start: -40px;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(214,185,128,0.18), transparent 65%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .card-title {
+      font-weight: 700;
+      font-size: 17px;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #e4e7ef;
+      padding-bottom: 10px;
+      color: var(--primary-dark);
+      position: relative;
+      z-index: 1;
+    }
+
+    .left-panel {
+      flex: 2;
+      min-height: 300px;
+    }
+
+    .right-panel {
+      flex: 1.1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    #sanad-list {
+      margin-top: 10px;
+      max-height: 500px;
+      overflow-y: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sanad-item {
+      border: 1px solid #e1e6f0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.05s;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: linear-gradient(135deg, #fbfdfd, #f6faf9);
+    }
+
+    .sanad-item:hover {
+      background: #edf8f6;
+      box-shadow: 0 2px 6px rgba(15,23,42,0.08);
+      transform: translateY(-1px);
+    }
+
+    .sanad-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .sanad-main {
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    .tag {
+      display: inline-block;
+      background: #e0f2ee;
+      color: var(--primary-dark);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 11px;
+      border: 1px solid #bfded5;
+    }
+
+    .sanad-meta {
+      font-size: 11px;
+      color: #777;
+      margin-top: 2px;
+    }
+
+    .empty-state {
+      font-size: 13px;
+      color: #999;
+      margin-top: 20px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #d2d7e3;
+      font-size: 13px;
+      outline: none;
+      transition: border 0.15s, box-shadow 0.15s, background 0.15s;
+      background: #fafbff;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(30,127,114,0.16);
+      background: #ffffff;
+    }
+
+    input[readonly] {
+      background: #f3f4f7;
+      color: #777;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.05s, box-shadow 0.1s, background 0.15s;
+    }
+
+    button:active {
+      transform: scale(0.97);
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(20,86,75,0.35);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: #101820;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    }
+
+    .btn-print {
+      background: var(--accent);
+      color: #102a27;
+      box-shadow: 0 2px 6px rgba(214,185,128,0.5);
+    }
+
+    .helper-text {
+      font-size: 11px;
+      color: #999;
+      margin-top: 2px;
+    }
+
+    .project-add {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .project-add input {
+      flex: 1;
+    }
+
+    #project-list {
+      margin-top: 10px;
+      max-height: 180px;
+      overflow-y: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .project-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      border: 1px solid #e1e6f0;
+      padding: 6px 8px;
+      border-radius: 8px;
+      margin-bottom: 5px;
+      background: #f9fbfd;
+    }
+
+    .project-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 160px;
+    }
+
+    .project-delete {
+      background: transparent;
+      color: #e53935;
+      border-radius: 999px;
+      padding: 0 6px;
+      font-size: 16px;
+      line-height: 1;
+      box-shadow: none;
+    }
+
+    .project-delete:hover {
+      background: #fee7e6;
+    }
+
+    .badge {
+      font-size: 11px;
+      background: #f2f4f7;
+      padding: 2px 6px;
+      border-radius: 999px;
+      color: #555;
+      margin-top: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    #print-area {
+      display: none;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #print-area, #print-area * {
+        visibility: visible !important;
+      }
+      #print-area {
+        display: block !important;
+        position: absolute;
+        inset: 0;
+        padding: 20px;
+        background: #ffffff;
+      }
+    }
+
+    .print-card {
+      max-width: 720px;
+      margin: 0 auto;
+      border-radius: 16px;
+      padding: 22px 26px 26px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #cfd9ea;
+      background:
+        linear-gradient(135deg, rgba(16,24,32,0.05), transparent 45%),
+        linear-gradient(315deg, rgba(214,185,128,0.11), transparent 45%),
+        #ffffff;
+    }
+
+    .print-card::before {
+      content: "";
+      position: absolute;
+      inset: 15% 10%;
+      background: url("https://pbs.twimg.com/profile_images/1883509326540574720/CIibwcQa_400x400.jpg") center center no-repeat;
+      background-size: 230px auto;
+      opacity: 0.06;
+      pointer-events: none;
+    }
+
+    .print-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .print-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--primary-dark);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+
+    .print-header-text {
+      text-align: right;
+      flex: 1;
+      margin-right: 10px;
+    }
+
+    .print-header-text h2 {
+      margin-bottom: 2px;
+      font-size: 20px;
+      color: var(--primary-dark);
+    }
+
+    .print-header-text .sub {
+      font-size: 11px;
+      color: #555;
+    }
+
+    .print-logo-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffffff, #e4f2ee);
+      padding: 6px;
+      border: 1px solid #bfded5;
+    }
+
+    .print-logo {
+      width: 60px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .print-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .print-field {
+      flex: 1 1 48%;
+      border-radius: 10px;
+      border: 1px solid #d7e2ec;
+      padding: 8px 10px;
+      background: rgba(248,250,252,0.9);
+    }
+
+    .print-field-label {
+      font-size: 11px;
+      color: #6b7280;
+      margin-bottom: 2px;
+    }
+
+    .print-field-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .print-signatures {
+      margin-top: 16px;
+    }
+
+    .sig-block {
+      font-size: 11px;
+      color: #555;
+      max-width: 160px;
+    }
+
+    .sig-label {
+      margin-bottom: 6px;
+    }
+
+    .sig-qr .qr-box {
+      width: 80px;
+      height: 80px;
+      border: 1px dashed #9ca3af;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f9fafb;
+      margin-bottom: 4px;
+    }
+
+    .sig-qr img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .sig-hint {
+      font-size: 10px;
+      color: #6b7280;
+    }
+
+    .print-footer {
+      margin-top: 18px;
+      font-size: 11px;
+      color: #666;
+      text-align: left;
+      border-top: 1px dashed #cfd9ea;
+      padding-top: 8px;
+    }
+
+    .export-actions {
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 8px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 2px 6px rgba(15,23,42,0.15);
+      background: #ffffff;
+      border: 1px solid #d2d7e3;
+      color: #111827;
+    }
+
+    .icon-btn:hover {
+      background: #f3f4ff;
+    }
+
+    .icon-btn.export {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary-dark);
+    }
+
+    .icon-btn.export:hover {
+      background: var(--primary-dark);
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        flex-direction: column;
+      }
+      .left-panel, .right-panel {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="site-header">
+    <img src="https://pbs.twimg.com/profile_images/1883509326540574720/CIibwcQa_400x400.jpg" alt="شعار جمعية وفود الحرم" class="site-logo" id="logo-header">
+    <div class="site-title-block">
+      <h1>جمعية وفود الحرم</h1>
+      <div class="subtitle">
+        نظام إدارة سندات التبرعات
+        (قاعدة البيانات في ملف CSV يُفتح في Excel ويوضع بجانب الصفحة)
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- السندات المحفوظة -->
+    <div class="card left-panel">
+      <div class="card-title">السندات (ملف قاعدة البيانات)</div>
+
+      <div class="export-actions">
+        <!-- أولاً: استيراد (سهم تحت) -->
+        <button class="icon-btn import" id="import-csv-btn" title="استيراد قاعدة البيانات (CSV) من الملف المجاور">
+          ⬇
+        </button>
+        <!-- ثانياً: تصدير (سهم فوق) -->
+        <button class="icon-btn export" id="export-csv-btn" title="تصدير قاعدة البيانات (CSV) إلى ملف">
+          ⬆
+        </button>
+      </div>
+      <div class="helper-text">
+        يتم الاستيراد تلقائيًا من الملف <b>wofoud_sanads_database.csv</b> إذا كان بجانب ملف HTML.<br>
+        يمكنك أيضًا الضغط على ⬇ لإعادة محاولة الاستيراد، أو ⬆ لتصدير الملف وحفظه بجوار الصفحة.
+      </div>
+
+      <div id="sanad-list"></div>
+      <div id="sanad-empty" class="empty-state">
+        لا توجد سندات محمّلة حاليًا. سيتم الاستيراد تلقائيًا إن وُجد ملف CSV بجوار الصفحة،
+        أو أضف سندات جديدة ثم صدّرها إلى ملف قاعدة بيانات.
+      </div>
+    </div>
+
+    <!-- نموذج إنشاء سند + إدارة المشاريع -->
+    <div class="right-panel">
+      <div class="card">
+        <div class="card-title">إنشاء / تعديل سند</div>
+
+        <div class="form-group">
+          <label for="sanad-number">رقم السند</label>
+          <input type="text" id="sanad-number" readonly />
+        </div>
+
+        <div class="form-group">
+          <label for="sanad-date">التاريخ</label>
+          <input type="date" id="sanad-date" />
+        </div>
+
+        <div class="form-group">
+          <label for="donor-name">اسم المتبرع</label>
+          <input type="text" id="donor-name" placeholder="مثال: محمد أحمد" />
+        </div>
+
+        <div class="form-group">
+          <label for="dedication">إهداء إلى (اختياري)</label>
+          <input type="text" id="dedication" placeholder="مثال: لوالديَّ رحمهما الله" />
+          <div class="helper-text">في حال تركه فارغًا لن يظهر سطر الإهداء في السند عند الطباعة.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="amount">المبلغ (ريال)</label>
+          <input type="number" id="amount" min="0" step="0.5" placeholder="مثال: 500" />
+        </div>
+
+        <div class="form-group">
+          <label for="project-select">ضمن مشروع</label>
+          <select id="project-select"></select>
+          <div class="helper-text">تستخرج المشاريع تلقائيًا من السندات، ويمكنك إضافة مشاريع جديدة من الأسفل.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="employee-name">اسم الموظف (داخلي – لا يظهر في السند)</label>
+          <input type="text" id="employee-name" placeholder="مثال: أحمد - موظف الاستقبال" />
+        </div>
+
+        <div class="form-group">
+          <label for="transfer-number">رقم التحويل في جهاز الشبكة (اختياري – لا يظهر في السند)</label>
+          <input type="text" id="transfer-number" placeholder="مثال: رقم العملية من جهاز الشبكة" />
+        </div>
+
+        <div class="actions">
+          <button class="btn-primary" id="save-btn">حفظ السند في الذاكرة</button>
+          <button class="btn-secondary" id="new-btn">سند جديد</button>
+          <button class="btn-print" id="print-btn">طباعة السند</button>
+        </div>
+        <div class="helper-text">
+          لحفظ السندات نهائيًا في ملف قاعدة البيانات، استخدم زر: ⬆ من القسم الأيسر.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">إدارة المشاريع</div>
+        <div class="project-add">
+          <input type="text" id="new-project-name" placeholder="اسم مشروع جديد" />
+          <button class="btn-primary" id="project-add-btn">إضافة</button>
+        </div>
+        <div class="badge">
+          يتم حفظ اسم المشروع داخل كل سند في ملف CSV، ويمكن لـ Excel قراءة هذه البيانات مباشرة.
+        </div>
+        <div id="project-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- منطقة الطباعة -->
+  <div id="print-area">
+    <div class="print-card">
+      <div class="print-content">
+        <div class="print-header">
+          <div class="print-header-text">
+            <h2>جمعية وفود الحرم</h2>
+            <div class="sub">WOFOUD ALHARAM ASSOCIATION – سند تبرع</div>
+          </div>
+          <div class="print-logo-box">
+            <img src="https://pbs.twimg.com/profile_images/1883509326540574720/CIibwcQa_400x400.jpg" alt="شعار الجمعية" class="print-logo" id="logo-print">
+          </div>
+        </div>
+
+        <div class="print-grid">
+          <div class="print-field">
+            <div class="print-field-label">رقم السند</div>
+            <div class="print-field-value" id="p-number"></div>
+          </div>
+
+          <div class="print-field">
+            <div class="print-field-label">التاريخ</div>
+            <div class="print-field-value" id="p-date"></div>
+          </div>
+
+          <div class="print-field">
+            <div class="print-field-label">اسم المتبرع</div>
+            <div class="print-field-value" id="p-donor"></div>
+          </div>
+
+          <div class="print-field" id="p-dedication-field">
+            <div class="print-field-label">إهداء إلى</div>
+            <div class="print-field-value" id="p-dedication"></div>
+          </div>
+
+          <div class="print-field">
+            <div class="print-field-label">المبلغ (ريال)</div>
+            <div class="print-field-value" id="p-amount"></div>
+          </div>
+
+          <div class="print-field">
+            <div class="print-field-label">ضمن مشروع</div>
+            <div class="print-field-value" id="p-project"></div>
+          </div>
+        </div>
+
+        <div class="print-signatures">
+          <div class="sig-block sig-qr">
+            <div class="sig-label">رمز الاستجابة السريعة للتبرع</div>
+            <div class="qr-box">
+              <img src="https://www2.0zz0.com/2025/11/21/02/144704480.png" alt="رمز QR للتبرع" id="qr-image">
+            </div>
+            <div class="sig-hint">امسح الكود لزيارة صفحة التبرع أو المتجر الإلكتروني للجمعية.</div>
+          </div>
+        </div>
+
+        <div class="print-footer">
+          هذا السند صادر آليًا من نظام إدارة سندات التبرعات بجمعية وفود الحرم، والبيانات الواردة فيه مسجلة في ملف قاعدة البيانات (CSV) المجاور للصفحة.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /*
+      ملاحظات التنفيذ:
+
+      - يتم استخدام localStorage كنسخة مؤقتة داخل المتصفح حتى لا تُفقد السندات عند تحديث الصفحة، بينما يبقى ملف CSV هو القاعدة الأساسية.
+      - القاعدة الأساسية هي ملف CSV باسم "wofoud_sanads_database.csv" بجانب ملف HTML.
+      - عند فتح الصفحة:
+          * نحاول تلقائيًا قراءة الملف عبر fetch.
+          * إذا نجح، يتم تحميل السندات والمشاريع.
+      - زر ⬇ يعيد محاولة الاستيراد يدويًا من نفس الملف.
+      - زر ⬆ يصدر السندات الحالية إلى ملف CSV يقوم المتصفح بتنزيله.
+      - الاتصال بالإنترنت مطلوب فقط لتحميل:
+          * صورة الشعار
+          * صورة الباركود (QR)
+    */
+
+    const DEFAULT_CSV_NAME = "wofoud_sanads_database.csv";
+
+    const LOCAL_STORAGE_KEY = "wofoud_sanads_local_cache_v1";
+
+    function saveToLocalCache() {
+      try {
+        if (!window.localStorage) return;
+      } catch (e) {
+        return;
+      }
+      try {
+        const payload = {
+          sanads,
+          projects
+        };
+        window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(payload));
+      } catch (err) {
+        console.error("localStorage save error:", err);
+      }
+    }
+
+    function loadFromLocalCache() {
+      try {
+        if (!window.localStorage) return false;
+      } catch (e) {
+        return false;
+      }
+      try {
+        const raw = window.localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        if (!data || typeof data !== "object") return false;
+
+        if (Array.isArray(data.sanads)) {
+          sanads = data.sanads.map(s => ({
+            id: typeof s.id === "number" ? s.id : (s.id ? Number(s.id) || null : null),
+            number: s.number || "",
+            date: s.date || "",
+            donorName: s.donorName || "",
+            dedication: s.dedication || "",
+            amount: s.amount !== undefined ? Number(s.amount) || 0 : 0,
+            projectName: s.projectName || "",
+            employeeName: s.employeeName || "",
+            transferNumber: s.transferNumber || ""
+          }));
+        } else {
+          sanads = [];
+        }
+
+        if (Array.isArray(data.projects)) {
+          projects = data.projects.map(p => ({
+            id: typeof p.id === "number" ? p.id : (p.id ? Number(p.id) || null : null),
+            name: p.name || ""
+          }));
+        } else {
+          projects = [];
+        }
+
+        // تأكد من وجود معرفات للسندات لتعمل قائمة السندات بشكل صحيح
+        let maxId = 0;
+        sanads.forEach(s => {
+          if (typeof s.id === "number" && s.id > maxId) {
+            maxId = s.id;
+          }
+        });
+        sanads.forEach(s => {
+          if (!s.id) {
+            maxId += 1;
+            s.id = maxId;
+          }
+        });
+
+        return true;
+      } catch (err) {
+        console.error("localStorage load error:", err);
+        return false;
+      }
+    }
+
+    let sanads = [];
+    let projects = [];
+    let currentSanadId = null;
+
+    function getNextSanadId() {
+      if (!sanads.length) return 1;
+      return Math.max(...sanads.map(s => s.id || 0)) + 1;
+    }
+
+    function getNextSanadNumber() {
+      if (!sanads.length) return 1000;
+      const nums = sanads
+        .map(s => Number(s.number) || 0)
+        .filter(n => n > 0);
+      if (!nums.length) return 1000;
+      return Math.max(...nums) + 1;
+    }
+
+    function formatDateInputValue(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    // ==================== إدارة المشاريع ======================
+
+    function rebuildProjectsFromSanads() {
+      const names = new Set();
+      sanads.forEach(s => {
+        if (s.projectName && s.projectName.trim() !== "") {
+          names.add(s.projectName.trim());
+        }
+      });
+      projects = Array.from(names).map((name, idx) => ({
+        id: idx + 1,
+        name
+      }));
+    }
+
+    function addProjectNameIfMissing(name) {
+      const clean = name.trim();
+      if (!clean) return;
+      const exists = projects.some(p => p.name === clean);
+      if (!exists) {
+        projects.push({
+          id: projects.length ? Math.max(...projects.map(p => p.id || 0)) + 1 : 1,
+          name: clean
+        });
+      }
+    }
+
+    function renderProjects() {
+      const select = document.getElementById("project-select");
+      const listDiv = document.getElementById("project-list");
+      select.innerHTML = "";
+      listDiv.innerHTML = "";
+
+      projects.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = p.name;
+        select.appendChild(opt);
+
+        const row = document.createElement("div");
+        row.className = "project-item";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "project-name";
+        nameSpan.textContent = p.name;
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "project-delete";
+        delBtn.innerHTML = "&times;";
+        delBtn.title = "حذف المشروع من القائمة الحالية";
+
+        delBtn.addEventListener("click", () => {
+          const confirmDelete = confirm("هل أنت متأكد من حذف هذا المشروع من القائمة الحالية؟ (لن يحذف من السندات الموجودة في الملف عند التصدير)");
+          if (!confirmDelete) return;
+          projects = projects.filter(pr => pr.id !== p.id);
+          renderProjects();
+          saveToLocalCache();
+        });
+
+        row.appendChild(nameSpan);
+        row.appendChild(delBtn);
+        listDiv.appendChild(row);
+      });
+    }
+
+    // ==================== قائمة السندات ======================
+
+    function renderSanadList() {
+      const sanadListDiv = document.getElementById("sanad-list");
+      const emptyDiv = document.getElementById("sanad-empty");
+      sanadListDiv.innerHTML = "";
+
+      if (!sanads.length) {
+        emptyDiv.style.display = "block";
+        return;
+      }
+
+      emptyDiv.style.display = "none";
+
+      const sorted = sanads.slice().sort((a, b) => {
+        const an = Number(a.number) || 0;
+        const bn = Number(b.number) || 0;
+        return an - bn;
+      });
+
+      sorted.forEach(sanad => {
+        const item = document.createElement("div");
+        item.className = "sanad-item";
+        item.dataset.id = sanad.id;
+
+        const mainRow = document.createElement("div");
+        mainRow.className = "sanad-row sanad-main";
+        mainRow.innerHTML =
+          `<span>سند رقم ${sanad.number}</span><span>${sanad.amount} ريال</span>`;
+
+        const secondRow = document.createElement("div");
+        secondRow.className = "sanad-row";
+        const donorName = sanad.donorName && sanad.donorName.trim() !== ""
+          ? sanad.donorName
+          : "بدون اسم";
+        secondRow.innerHTML =
+          `<span>${donorName}</span><span>${sanad.date || ""}</span>`;
+
+        const projectRow = document.createElement("div");
+        projectRow.className = "sanad-row";
+        projectRow.innerHTML =
+          `<span class="tag">${sanad.projectName || "بدون مشروع"}</span>`;
+
+        const metaRow = document.createElement("div");
+        metaRow.className = "sanad-meta";
+        if (sanad.employeeName && sanad.employeeName.trim() !== "") {
+          metaRow.textContent = "الموظف: " + sanad.employeeName;
+        }
+
+        item.appendChild(mainRow);
+        item.appendChild(secondRow);
+        item.appendChild(projectRow);
+        if (metaRow.textContent !== "") {
+          item.appendChild(metaRow);
+        }
+
+        item.addEventListener("click", () => {
+          loadSanadIntoForm(sanad.id);
+        });
+
+        sanadListDiv.appendChild(item);
+      });
+    }
+
+    // ==================== النموذج ======================
+
+    function startNewSanad() {
+      currentSanadId = null;
+      document.getElementById("sanad-number").value = getNextSanadNumber();
+      document.getElementById("sanad-date").value = formatDateInputValue(new Date());
+      document.getElementById("donor-name").value = "";
+      document.getElementById("dedication").value = "";
+      document.getElementById("amount").value = "";
+      document.getElementById("employee-name").value = "";
+      document.getElementById("transfer-number").value = "";
+
+      const projectSelect = document.getElementById("project-select");
+      if (projectSelect.options.length > 0) {
+        projectSelect.selectedIndex = 0;
+      }
+    }
+
+    function loadSanadIntoForm(id) {
+      const sanad = sanads.find(s => s.id === id);
+      if (!sanad) return;
+
+      currentSanadId = sanad.id;
+      document.getElementById("sanad-number").value = sanad.number || "";
+      document.getElementById("sanad-date").value = sanad.date || "";
+      document.getElementById("donor-name").value = sanad.donorName || "";
+      document.getElementById("dedication").value = sanad.dedication || "";
+      document.getElementById("amount").value = sanad.amount || "";
+      document.getElementById("employee-name").value = sanad.employeeName || "";
+      document.getElementById("transfer-number").value = sanad.transferNumber || "";
+
+      const projectSelect = document.getElementById("project-select");
+      if (sanad.projectName && projectSelect.options.length) {
+        for (let i = 0; i < projectSelect.options.length; i++) {
+          if (projectSelect.options[i].textContent === sanad.projectName) {
+            projectSelect.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }
+
+    function handleSaveSanad() {
+      const numberField = document.getElementById("sanad-number");
+      let number = numberField.value.trim();
+      const date = document.getElementById("sanad-date").value;
+      const donorName = document.getElementById("donor-name").value.trim();
+      const dedication = document.getElementById("dedication").value.trim();
+      const amountRaw = document.getElementById("amount").value.trim();
+      const employeeName = document.getElementById("employee-name").value.trim();
+      const transferNumber = document.getElementById("transfer-number").value.trim();
+      const projectSelect = document.getElementById("project-select");
+
+      if (!amountRaw) {
+        alert("الرجاء إدخال مبلغ التبرع.");
+        return;
+      }
+
+      const amount = Number(amountRaw);
+      if (isNaN(amount) || amount <= 0) {
+        alert("الرجاء إدخال مبلغ صالح أكبر من صفر.");
+        return;
+      }
+
+      if (!date) {
+        alert("الرجاء اختيار التاريخ.");
+        return;
+      }
+
+      let projectName = "";
+      if (projectSelect.options.length > 0) {
+        const opt = projectSelect.selectedOptions[0];
+        projectName = opt ? opt.textContent : "";
+      }
+
+      if (!number) {
+        number = getNextSanadNumber();
+        numberField.value = number;
+      }
+
+      let sanad = null;
+      if (currentSanadId !== null) {
+        sanad = sanads.find(s => s.id === currentSanadId);
+      }
+
+      if (!sanad) {
+        sanad = {
+          id: getNextSanadId()
+        };
+        sanads.push(sanad);
+        currentSanadId = sanad.id;
+      }
+
+      sanad.number = number;
+      sanad.date = date;
+      sanad.donorName = donorName;
+      sanad.dedication = dedication;
+      sanad.amount = amount;
+      sanad.projectName = projectName;
+      sanad.employeeName = employeeName;
+      sanad.transferNumber = transferNumber;
+
+      if (projectName) {
+        addProjectNameIfMissing(projectName);
+        renderProjects();
+      }
+
+      renderSanadList();
+      saveToLocalCache();
+      alert("تم حفظ السند في الذاكرة الحالية.\nلا تنسَ تصدير ملف CSV لحفظ التعديلات في ملف القاعدة.");
+    }
+
+    function handlePrintSanad() {
+      const number = document.getElementById("sanad-number").value.trim();
+      const date = document.getElementById("sanad-date").value;
+      const donorName = document.getElementById("donor-name").value.trim() || "غير محدد";
+      const dedication = document.getElementById("dedication").value.trim();
+      const amount = document.getElementById("amount").value.trim() || "0";
+      const projectSelect = document.getElementById("project-select");
+      const projectName = projectSelect.selectedOptions.length
+        ? projectSelect.selectedOptions[0].textContent
+        : "غير محدد";
+
+      document.getElementById("p-number").textContent = number || "-";
+      document.getElementById("p-date").textContent = date || "-";
+      document.getElementById("p-donor").textContent = donorName;
+      document.getElementById("p-amount").textContent = amount;
+      document.getElementById("p-project").textContent = projectName;
+
+      const dedField = document.getElementById("p-dedication-field");
+      if (dedication === "") {
+        dedField.style.display = "none";
+      } else {
+        dedField.style.display = "block";
+        document.getElementById("p-dedication").textContent = dedication;
+      }
+
+      window.print();
+    }
+
+    // ==================== CSV ======================
+
+    function escapeCsvValue(value) {
+      if (value === null || value === undefined) return "";
+      const str = String(value).replace(/"/g, '""');
+      return `"${str}"`;
+    }
+
+    function handleExportCsv() {
+      if (!sanads.length) {
+        const ok = confirm("لا توجد سندات حالياً.\nهل تريد تصدير ملف قاعدة بيانات فارغ مع ترويسات الأعمدة؟");
+        if (!ok) return;
+      }
+
+      const headers = [
+        "id",
+        "number",
+        "date",
+        "donorName",
+        "dedication",
+        "amount",
+        "projectName",
+        "employeeName",
+        "transferNumber"
+      ];
+
+      const rows = sanads.map(s => {
+        return headers.map(h => escapeCsvValue(s[h] ?? "")).join(",");
+      });
+
+      const csvContent = "\uFEFF" + headers.join(",") + (rows.length ? "\n" + rows.join("\n") : "");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = DEFAULT_CSV_NAME;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function parseCsv(text) {
+      if (text.charCodeAt(0) === 0xFEFF) {
+        text = text.slice(1);
+      }
+      const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
+      if (!lines.length) return [];
+
+      const headerLine = lines[0];
+      const headers = headerLine.split(",").map(h => h.trim().replace(/^"|"$/g, ""));
+
+      const result = [];
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        const values = [];
+        let current = "";
+        let inQuotes = false;
+
+        for (let j = 0; j < line.length; j++) {
+          const ch = line[j];
+          if (ch === '"') {
+            if (inQuotes && j + 1 < line.length && line[j + 1] === '"') {
+              current += '"';
+              j++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (ch === "," && !inQuotes) {
+            values.push(current);
+            current = "";
+          } else {
+            current += ch;
+          }
+        }
+        values.push(current);
+
+        const obj = {};
+        headers.forEach((h, idx) => {
+          obj[h] = (values[idx] ?? "").trim();
+        });
+        result.push(obj);
+      }
+      return result;
+    }
+
+    function applyImportedRows(rows, showMessages) {
+      sanads = rows.map(row => ({
+        id: row.id ? Number(row.id) : null,
+        number: row.number || "",
+        date: row.date || "",
+        donorName: row.donorName || "",
+        dedication: row.dedication || "",
+        amount: row.amount ? Number(row.amount) : 0,
+        projectName: row.projectName || "",
+        employeeName: row.employeeName || "",
+        transferNumber: row.transferNumber || ""
+      }));
+
+      sanads.forEach(s => {
+        if (!s.id) {
+          s.id = getNextSanadId();
+        }
+      });
+
+      rebuildProjectsFromSanads();
+      renderProjects();
+      renderSanadList();
+      saveToLocalCache();
+
+      if (sanads.length) {
+        document.getElementById("sanad-empty").style.display = "none";
+      }
+
+      startNewSanad();
+
+      if (showMessages) {
+        alert("تم استيراد قاعدة البيانات من الملف المجاور بنجاح.");
+      }
+    }
+
+    async function tryAutoImportCsv(showMessages) {
+      try {
+        const response = await fetch(DEFAULT_CSV_NAME, { cache: "no-store" });
+        if (!response.ok) {
+          if (showMessages) {
+            alert("لم يتم العثور على ملف القاعدة (" + DEFAULT_CSV_NAME + ") بجوار الصفحة.");
+          }
+          return;
+        }
+        const text = await response.text();
+        const rows = parseCsv(text);
+        if (!rows.length) {
+          if (showMessages) {
+            alert("ملف CSV الموجود بجوار الصفحة فارغ أو لا يحتوي على بيانات سندات.");
+          }
+          return;
+        }
+        applyImportedRows(rows, showMessages);
+      } catch (err) {
+        console.error("CSV auto-import error:", err);
+        if (showMessages) {
+          alert("تعذر قراءة ملف القاعدة تلقائيًا. تأكد أن الملف في نفس مجلد HTML وأن المتصفح يسمح بقراءته.");
+        }
+      }
+    }
+
+    // ==================== تهيئة ======================
+
+    document.addEventListener("DOMContentLoaded", () => {
+      sanads = [];
+      projects = [];
+
+      const loadedFromLocal = loadFromLocalCache();
+
+      renderProjects();
+      renderSanadList();
+      startNewSanad();
+
+      document.getElementById("save-btn").addEventListener("click", handleSaveSanad);
+      document.getElementById("new-btn").addEventListener("click", startNewSanad);
+      document.getElementById("print-btn").addEventListener("click", handlePrintSanad);
+      document.getElementById("export-csv-btn").addEventListener("click", handleExportCsv);
+
+      document.getElementById("project-add-btn").addEventListener("click", () => {
+        const input = document.getElementById("new-project-name");
+        const name = input.value.trim();
+        if (!name) {
+          alert("الرجاء إدخال اسم المشروع.");
+          return;
+        }
+        addProjectNameIfMissing(name);
+        input.value = "";
+        renderProjects();
+        saveToLocalCache();
+      });
+
+      document.getElementById("import-csv-btn").addEventListener("click", () => {
+        tryAutoImportCsv(true);
+      });
+
+      // استيراد تلقائي عند فتح الصفحة (بدون رسائل منبثقة)
+      if (!loadedFromLocal) {
+        tryAutoImportCsv(false);
+      }
+    });
+  </script>
+</body>
+</html>
